@@ -8,6 +8,7 @@ interface UserModelAttributes {
   city: string;
   image: string;
   role_id: string;
+  token: string;
 }
 
 class User extends Model<UserModelAttributes> implements UserModelAttributes {
@@ -19,6 +20,8 @@ class User extends Model<UserModelAttributes> implements UserModelAttributes {
   public image!: string;
 
   public role_id!: string;
+  public token!: string;
+
   id: any;
 }
 
@@ -52,6 +55,10 @@ User.init(
     role_id: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    token: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

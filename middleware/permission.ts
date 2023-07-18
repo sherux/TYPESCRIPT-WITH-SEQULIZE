@@ -5,10 +5,6 @@ import Role from "../models/role.model";
 import Permission from "../models/permission.model";
 import { WhereOptions } from "sequelize";
 
-// interface AuthenticatedRequest extends Request {
-//   user: any;
-// }
-
 const permissionAuthentication = (param1: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const token = req.header("token");
@@ -16,7 +12,6 @@ const permissionAuthentication = (param1: string) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    var errorMessage;
     try {
       Role.hasMany(Permission, { foreignKey: "id" });
       Permission.belongsTo(Role, { foreignKey: "role_id" });
@@ -24,6 +19,9 @@ const permissionAuthentication = (param1: string) => {
       Role.belongsTo(User, { foreignKey: "role_id" });
 
       const decoded: any = jwt.verify(token, "Abbas ali");
+      const user: any = await User.findOne({
+        where: { id: decoded.id },
+      } as any);
       req.user = decoded;
       const getUserId = decoded.id;
       const checkUserId: any = await User.findOne({

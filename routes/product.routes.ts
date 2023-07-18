@@ -10,7 +10,7 @@ import {
 } from "../controllers/product.controller";
 import permissionAuthentication from "../middleware/permission";
 
-// ALL user ROUTES
+// ALL USER ROUTES
 router.get("/:id", permissionAuthentication("view"), getProductDetails);
 router.get("/", permissionAuthentication("view"), getProductLists);
 router.post("/add", permissionAuthentication("add"), addProduct);
