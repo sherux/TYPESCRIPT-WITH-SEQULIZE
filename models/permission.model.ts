@@ -12,8 +12,8 @@ interface PermissionModelAttributes {
 
 class Permission
   extends Model<PermissionModelAttributes>
-  implements PermissionModelAttributes
-{
+  implements PermissionModelAttributes {
+
   public role_id!: string;
   public add!: boolean;
   public edit!: boolean;

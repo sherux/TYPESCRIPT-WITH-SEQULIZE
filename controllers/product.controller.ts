@@ -45,7 +45,7 @@ export const getProductDetails: RequestHandler = async (req, res) => {
 
 export const getProductLists: RequestHandler = async (req, res) => {
   try {
-    const productData = await PRODUCT.findAll({});
+    const productData = await PRODUCT.findAll();
 
     if (!productData)
       return res.status(400).json({ message: "product data not found" });

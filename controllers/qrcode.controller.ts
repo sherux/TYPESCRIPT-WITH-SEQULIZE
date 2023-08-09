@@ -1,26 +1,22 @@
 import { RequestHandler } from "express";
-import PERMISIION from "../models/permission.model";
+import QRCODE from "../models/qr.model";
 
+import { changeTime, changeTimeFormat } from "../util/common";
 
-export const addPermission: RequestHandler = async (req, res) => {
-  try {
+export const addQr: RequestHandler = async (req, res) => {
+    try {
+        const qrData = new QRCODE({
+            content: req.body.content,
 
+        });
 
-    const permisionData = new PERMISIION({
-      role_id: req.body.roleId,
-      add: req.body.add,
-      edit: req.body.edit,
-      deleted: req.body.deleted,
-      view: req.body.view,
-    });
-
-    const permissionDataSave = await permisionData.save();
-    res
-      .status(200)
-      .json({ message: "Data successfully created", data: permissionDataSave });
-  } catch (error: any) {
-    res.status(500).json({ message: error });
-  }
+        const qrDataSave = await qrData.save();
+        res
+            .status(200)
+            .json({ message: "Data successfully created", data: qrDataSave });
+    } catch (error: any) {
+        res.status(500).json({ message: error });
+    }
 };
 
 // export const getUserDetails: RequestHandler = async (req, res) => {

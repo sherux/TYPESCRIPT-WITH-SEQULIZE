@@ -4,6 +4,7 @@ import User from "../models/user.model";
 import Role from "../models/role.model";
 import Permission from "../models/permission.model";
 import { WhereOptions } from "sequelize";
+require("dotenv").config();
 
 const permissionAuthentication = (param1: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +19,8 @@ const permissionAuthentication = (param1: string) => {
       User.hasOne(Role, { foreignKey: "id" });
       Role.belongsTo(User, { foreignKey: "role_id" });
 
-      const decoded: any = jwt.verify(token, "Abbas ali");
+      const decoded: any = jwt.verify(token, process.env.SECRET_TOKEN as string,
+      );
       const user: any = await User.findOne({
         where: { id: decoded.id },
       } as any);

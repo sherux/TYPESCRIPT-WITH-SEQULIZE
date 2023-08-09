@@ -1,7 +1,9 @@
 import express from "express";
 const router = express.Router();
 import { auth } from "../middleware/auth";
-import { uploads } from "../util/fileupload";
+import { upload } from "../util/fileupload";
+
+
 import {
   addUser,
   getUserDetails,
@@ -14,16 +16,15 @@ import {
   userForgetPassword,
   userResetPassword,
 } from "../controllers/user.controller";
-import { Multer } from "multer";
 // Replace this with your actual multer setup.
 
 // ALL user ROUTES
 router.get("/checkAuth", auth, checkAuth);
 router.get("/:id", getUserDetails);
 router.get("/", getUserLists);
-router.post("/add", uploads.single("profile"), addUser);
+router.post("/add", upload.single("profile"), addUser);
 router.post("/login", userLogin);
-router.put("/:id", updatedUser);
+router.put("/:id", upload.single("profile"), updatedUser);
 router.delete("/:id", deleteUser);
 router.post("/logout", auth, userLogout);
 router.post("/forget-password", userForgetPassword);

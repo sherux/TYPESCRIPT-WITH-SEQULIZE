@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import PERMISIION from "../models/permission.model";
-
 import ROLE from "../models/role.model";
 import { WhereOptions } from "sequelize";
 import { changeTime, changeTimeFormat } from "../util/common";

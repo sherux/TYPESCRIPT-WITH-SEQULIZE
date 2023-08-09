@@ -1,9 +1,18 @@
-const multer = require("multer");
-const multerS3 = require("multer-s3");
+// const multer = require("multer");
+// import {
+//   S3Client,
+//   PutObjectCommand,
+//   GetObjectCommand,
+//   DeleteObjectCommand,
+// } from '@aws-sdk/client-s3';
 // const AWS = require("aws-sdk");
-// require("dotenv").config();
+require("dotenv").config();
 // const uniqid = require("uniqid");
 import fs from "fs";
+import { RequestHandler } from "express";
+
+
+
 
 // ------------------------------file upload on aws s3---------------------
 // var accessKeyId;
@@ -86,40 +95,56 @@ import fs from "fs";
 //   }),
 // });
 
-import { config as dotenvConfig } from 'dotenv';
-import { createReadStream } from 'fs';
-import AWS from 'aws-sdk';
+// import { config as dotenvConfig } from 'dotenv';
+// import { createReadStream } from 'fs';
+// import AWS from 'aws-sdk';
 
-// Load environment variables from .env file
-dotenvConfig();
+// // Load environment variables from .env file
+// dotenvConfig();
+
+// const bucketName: string = process.env.AWS_BUCKET as string;
+// const region: string = process.env.AWS_BUCKET_REGION as string;
+// const accessKeyId: string = process.env.AWS_ID as string;
+// const secretAccessKey: string = process.env.AWS_SECRET as string;
+
+// const s3 = new S3Client({
+//   credentials: {
+//     accessKey: accessKeyId,
+//     secretAccess: secretAccessKey,``
+// } as any,
+//   region,
+
+// });
+// export const data: RequestHandler = async (req: any) => {
+
+//   const params = {
+//     Bucket: bucketName,
+//     Key: req.file.originalname as any,
+//     Body: req.file.buffer as any,
+//     contentType: req.file.mimetype
+
+//   }
+//   const command = new PutObjectCommand(params)
+//   await s3.send(command)
+
+// }
 
 
 
-const bucketName: string = process.env.AWS_BUCKET as string;
-const region: string = process.env.AWS_BUCKET_REGION as string;
-const accessKeyId: string = process.env.AWS_ID as string;
-const secretAccessKey: string = process.env.AWS_SECRET as string;
+// // Uploads a file to S3
+// export function uploadFile(
+//   file: Express.Multer.File
+// ): Promise<AWS.S3.ManagedUpload.SendData> {
+//   const fileStream = createReadStream(file.path);
 
-const s3 = new AWS.S3({
-  region,
-  accessKeyId,
-  secretAccessKey,
-});
+//   const uploadParams: AWS.S3.PutObjectRequest = {
+//     Bucket: bucketName,
+//     Body: fileStream,
+//     Key: file.filename,
+//   };
 
-// Uploads a file to S3
-export function uploadFile(
-  file: Express.Multer.File
-): Promise<AWS.S3.ManagedUpload.SendData> {
-  const fileStream = createReadStream(file.path);
-
-  const uploadParams: AWS.S3.PutObjectRequest = {
-    Bucket: bucketName,
-    Body: fileStream,
-    Key: file.filename,
-  };
-
-  return s3.upload(uploadParams).promise();
-}
+//   return s3.upload(uploadParams).promise();
+// }
 ;
 
 // Update uploadFile function to use multer and AWS S3
@@ -136,19 +161,95 @@ export function uploadFile(
 // }
 // export { getFileStream };
 //-----------------------------------IMGES UPLOADED FOLDER------------------
-const uploadDestination = "./uploads";
+// const uploadDestination = "./uploads";
 
-if (!fs.existsSync(uploadDestination)) {
-  fs.mkdirSync(uploadDestination);
-}
+// if (!fs.existsSync(uploadDestination)) {
+//   fs.mkdirSync(uploadDestination);
+// }
 
-const upload = multer.diskStorage({
-  destination: (req: any, file: any, cb: any) => {
-    cb(null, uploadDestination);
-  },
+// const upload = multer.diskStorage({
+//   destination: (req: any, file: any, cb: any) => {
+//     cb(null, uploadDestination);
+//   },
 
-  filename: (req: any, file: any, cb: any) => {
-    cb(null, Date.now() + "--" + file.originalname);
+//   filename: (req: any, file: any, cb: any) => {
+//     cb(null, Date.now() + "--" + file.originalname);
+//   },
+// });
+// export const uploads = multer({ storage: upload });
+
+
+
+
+
+
+
+
+
+
+
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
+import dotenv from 'dotenv';
+dotenv.config();
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import multer from 'multer';
+
+const storage = multer.memoryStorage();
+export const upload = multer({ storage: storage });
+
+const bucketName: string = process.env.AWS_BUCKET as string;
+const region: string = process.env.AWS_BUCKET_REGION as string;
+const accessKeyId: string = process.env.AWS_ID as string;
+const secretAccessKey: string = process.env.AWS_SECRET as string;
+
+const s3Client = new S3Client({
+  region,
+  credentials: {
+    accessKeyId,
+    secretAccessKey,
   },
 });
-export const uploads = multer({ storage: upload });
+
+export function uploadFile(
+  fileBuffer: Buffer,
+  fileName: string
+) {
+  const uploadParams = {
+    Bucket: bucketName,
+    Body: fileBuffer,
+    Key: fileName,
+  };
+
+  return s3Client.send(new PutObjectCommand(uploadParams));
+}
+
+export async function getObjectSignedUrl(key: string) {
+  const params = {
+    Bucket: bucketName,
+    Key: key,
+  };
+
+  const command = new GetObjectCommand(params);
+  const seconds = 60;
+  const url = await getSignedUrl(s3Client, command);
+
+  return url;
+}
+
+export async function deleteObjectSignedUrl(key: string) {
+  const params = {
+    Bucket: bucketName,
+    Key: key,
+  };
+
+  const command = new DeleteObjectCommand(params);
+  const seconds = 60;
+  const deleted = await getSignedUrl(s3Client, command);
+
+  return { success: deleted };
+}
