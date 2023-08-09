@@ -15,6 +15,7 @@ import {
   userLogout,
   userForgetPassword,
   userResetPassword,
+  userChangePassword
 } from "../controllers/user.controller";
 // Replace this with your actual multer setup.
 
@@ -29,6 +30,8 @@ router.delete("/:id", deleteUser);
 router.post("/logout", auth, userLogout);
 router.post("/forget-password", userForgetPassword);
 router.post("/reset-password", userResetPassword);
+router.post("/change-password", userChangePassword);
+
 
 export default router;
 

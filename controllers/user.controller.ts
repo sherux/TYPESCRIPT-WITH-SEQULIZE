@@ -9,8 +9,9 @@ import { changeTime, changeTimeFormat } from "../util/common";
 import Sequelize from "sequelize";
 import { sendResetPasswordEmail } from "../util/nodemailer";
 import { userSchema, handleZodValidationError } from "../validation/user.validation"
-import { getObjectSignedUrl, uploadFile, deleteObjectSignedUrl } from "../util/fileupload";
+import { getObjectSignedUrl, uploadFile } from "../util/fileupload";
 import { ZodError } from "zod";
+import { CloudFormation } from "aws-sdk";
 require("dotenv").config();
 
 
@@ -367,6 +368,62 @@ export const userLogout: RequestHandler = async (
     res.status(500).json({ message: error.message });
   }
 };
+
+export const userChangePassword: RequestHandler = async (
+  req: any,
+  res: any,
+  next: any
+) => {
+  try {
+    const token: string = req.headers.token; // Extract token from Authorization header
+    console.log(token);
+
+    if (!token) {
+      return res.status(401).json({ message: 'Authorization token not provided' });
+    }
+
+    const decodedToken: any = jwt.verify(token, process.env.SECRET_TOKEN as string); // Change this to your actual secret key
+    const userId: number = decodedToken.id;
+
+    const user = await User.findByPk(userId);
+    console.log(user);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const oldPassword = req.body.oldPassword;
+    const newPassword = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword
+
+    if (!(newPassword === confirmPassword)) {
+      return res
+        .status(400)
+        .json({ message: "confirmPassword and newPassword does not match" });
+    }
+
+    const isPasswordValid: boolean = bcrypt.compareSync(oldPassword, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Invalid old password' });
+    }
+
+    const salt = await bcrypt.genSalt(12);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    await User.update(
+      { password: hashedNewPassword },
+      { where: { id: user.id } as WhereOptions }
+    );
+
+    return res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+
+};
+
+
 export const userForgetPassword: RequestHandler = async (
   req: any,
   res: any,

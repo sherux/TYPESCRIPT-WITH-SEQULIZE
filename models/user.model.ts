@@ -18,7 +18,6 @@ class User extends Model<UserModelAttributes> implements UserModelAttributes {
   public mobile_no!: string;
   public city!: string;
   public image!: string;
-
   public role_id!: string;
   public token!: string;
 

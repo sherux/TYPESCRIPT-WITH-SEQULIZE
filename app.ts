@@ -10,14 +10,12 @@ import userRoutes from "./routes/user.routes";
 import rolerRoutes from "./routes/role.routes";
 import productRoutes from "./routes/product.routes";
 import permissionsRoutes from "./routes/permission.routes";
-import qrRoutes from "./routes/qr.routes";
 
 
 app.use("/user", userRoutes);
 app.use("/role", rolerRoutes);
 app.use("/product", productRoutes);
 app.use("/permission", permissionsRoutes);
-app.use("/qrcode", qrRoutes);
 
 
 // console.log(process.env);

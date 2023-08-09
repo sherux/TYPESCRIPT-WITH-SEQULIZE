@@ -1,23 +1,14 @@
-// const Sequelize = require("sequelize");
-// require("dotenv").config();
-// console.log(process.env.database);
-// const database = process.env.database;
-// const user = process.env.user;
-// const password = process.env.password;
-// const host = process.env.host;
-// console.log(password);
-
-// export const sequelize = new Sequelize(database, user, password, {
-//   dialect: "mysql",
-//   host: host,
-//   logging: false,
-// });
-
 const Sequelize = require("sequelize");
 require("dotenv").config();
+const database = process.env.database as string;
+const username = process.env.username as string;
+const password = process.env.password as string;
+const host = process.env.host as string;
 
-export const sequelize = new Sequelize("USER", "root", "Abbas@123", {
+export const sequelize = new Sequelize(database, username, password, {
   dialect: "mysql",
-  host: process.env.host,
+  host: host,
   logging: false,
 });
+
+
