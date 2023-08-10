@@ -296,10 +296,6 @@ export const updatedUser: RequestHandler = async (req, res) => {
     if (!userData)
       return res.status(400).json({ message: "user data not found" });
 
-
-
-
-
     const updatedData = await User.update(
       {
         mobile_no: req.body.mobileNo,
@@ -318,6 +314,9 @@ export const updatedUser: RequestHandler = async (req, res) => {
   }
 
 }
+
+
+
 export const userLogin: RequestHandler = async (req, res) => {
   try {
     const email = req.body.email;
@@ -376,7 +375,6 @@ export const userChangePassword: RequestHandler = async (
 ) => {
   try {
     const token: string = req.headers.token; // Extract token from Authorization header
-    console.log(token);
 
     if (!token) {
       return res.status(401).json({ message: 'Authorization token not provided' });
@@ -386,7 +384,6 @@ export const userChangePassword: RequestHandler = async (
     const userId: number = decodedToken.id;
 
     const user = await User.findByPk(userId);
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -492,5 +489,6 @@ export const userResetPassword: RequestHandler = async (
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
